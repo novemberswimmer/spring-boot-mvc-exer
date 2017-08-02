@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(GreetingController.class)
@@ -33,7 +34,14 @@ public class GreetingControllerTest {
         Assert.assertTrue("Error HTML Body does not contain expected content", content.contains("Hello, Joe!"));
     }
 
+    @Test
+    public void testGreeting_SessionValue() throws Exception {
+        MvcResult result = callControllerHandlerMethod("/greetingSession?name=Joe");
+        String sessionName = result.getRequest().getSession().getAttribute("name").toString();
+        Assert.assertTrue("Error expected session value not found", sessionName.equals("Joe"));
+    }
+
     private MvcResult callControllerHandlerMethod(String url) throws Exception {
-        return mockMvc.perform(get(url).accept(MediaType.TEXT_PLAIN)).andReturn();
+        return mockMvc.perform(get(url).accept(MediaType.TEXT_PLAIN)).andExpect(status().isOk()).andReturn();
     }
 }
